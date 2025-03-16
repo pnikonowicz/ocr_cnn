@@ -1,23 +1,27 @@
 package neuron
 
-import "math"
+import (
+	"math"
+	"math/rand"
+)
 
 type Edge struct {
-	Weight     float32
-	NeuronTo   *Neuron
-	NeuronFrom *Neuron
+	Weight float32
+	Neuron *Neuron
 }
 
 type Neuron struct {
-	Neighbors  []*Edge
-	Bias       float32
-	Activation float32
+	NeighborsFrom []*Edge
+	NeighborsTo   []*Edge
+	Bias          float32
+	Activation    float32
 }
 
 type ANN struct {
 	InputLayer   []*Neuron
 	HiddenLayers [][]*Neuron
 	OutputLayer  []*Neuron
+	RandomFunc   func() float32
 }
 
 func CreateANN(layerSize, numberOfHiddenLayers int) ANN {
@@ -39,13 +43,20 @@ func CreateANN(layerSize, numberOfHiddenLayers int) ANN {
 	}
 
 	for i := 0; i < 10; i++ {
-		outputLayer = append(outputLayer, &Neuron{})
+		var neighborEdges []*Edge
+
+		outputLayer = append(outputLayer, &Neuron{
+			Activation:    0.0,
+			NeighborsTo:   nil,
+			NeighborsFrom: neighborEdges,
+		})
 	}
 
 	ann := ANN{
 		InputLayer:   inputLayer,
 		HiddenLayers: hiddenLayers,
 		OutputLayer:  outputLayer,
+		RandomFunc:   rand.Float32,
 	}
 
 	return ann
