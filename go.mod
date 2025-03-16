@@ -1,3 +1,3 @@
 module ocr_cnn
 
-go 1.22.10
+go 1.23
