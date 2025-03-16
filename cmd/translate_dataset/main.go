@@ -6,18 +6,10 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"ocr_cnn/pkg/common"
 	"os"
 	"path"
 )
-
-func log(message string) {
-	fmt.Println(message)
-}
-
-func printAndTerminate(message string) {
-	log(message)
-	os.Exit(1)
-}
 
 func translatePixels(original_img image.Image) image.Image {
 	bounds := original_img.Bounds()
@@ -60,13 +52,13 @@ func saveFile(dest_file_name string, translated_image image.Image) {
 	// Create the output file
 	outputFile, err := os.Create(dest_file_name)
 	if err != nil {
-		printAndTerminate(fmt.Sprintf("could not create output file: %s %s", dest_file_name, err.Error()))
+		common.PrintAndTerminate(fmt.Sprintf("could not create output file: %s %s", dest_file_name, err.Error()))
 	}
 	defer outputFile.Close()
-	
+
 	// Encode and save the new image
 	if err := png.Encode(outputFile, translated_image); err != nil {
-		printAndTerminate(fmt.Sprintf("could not encode PNG: %s", dest_file_name))
+		common.PrintAndTerminate(fmt.Sprintf("could not encode PNG: %s", dest_file_name))
 	}
 }
 
@@ -82,11 +74,11 @@ func main() {
 		dir_iterator, err := os.ReadDir(source_dir)
 
 		if err := os.MkdirAll(dest_dir, 0755); err != nil {
-			printAndTerminate(fmt.Sprintf("could not create output directory: %s", dest_dir))
+			common.PrintAndTerminate(fmt.Sprintf("could not create output directory: %s", dest_dir))
 		}
 
 		if err != nil {
-			printAndTerminate("could not read dir")
+			common.PrintAndTerminate("could not read dir")
 		}
 
 		for _, file_entry := range dir_iterator {
@@ -94,12 +86,12 @@ func main() {
 			dest_file_name := path.Join(dest_dir, file_entry.Name())
 			file_contents, err := os.ReadFile(source_file_name)
 			if err != nil {
-				printAndTerminate(fmt.Sprintf("could not read file: %s", source_file_name))
+				common.PrintAndTerminate(fmt.Sprintf("could not read file: %s", source_file_name))
 			}
 
 			img, err := png.Decode(bytes.NewReader(file_contents))
 			if err != nil {
-				printAndTerminate(fmt.Sprintf("could not read png: %s", source_file_name))
+				common.PrintAndTerminate(fmt.Sprintf("could not read png: %s", source_file_name))
 			}
 
 			var _ string = dest_file_name

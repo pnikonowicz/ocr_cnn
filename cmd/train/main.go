@@ -5,29 +5,21 @@ import (
 	"fmt"
 	"image/png"
 	"math"
+	"ocr_cnn/pkg/common"
 	"ocr_cnn/pkg/neuron"
 	"os"
 	"path"
 )
 
-func log(message string) {
-	fmt.Println(message)
-}
-
-func printAndTerminate(message string) {
-	log(message)
-	os.Exit(1)
-}
-
 func findResolution(dataset_dir string) (int, int) {
 	file_path := path.Join(dataset_dir, "0", "Abadi_0.png")
 	file_contents, err := os.ReadFile(file_path)
 	if err != nil {
-		printAndTerminate(fmt.Sprintf("could not read file: %s", file_path))
+		common.PrintAndTerminate(fmt.Sprintf("could not read file: %s", file_path))
 	}
 	img, err := png.Decode(bytes.NewReader(file_contents))
 	if err != nil {
-		printAndTerminate(fmt.Sprintf("could not read png: %s", file_path))
+		common.PrintAndTerminate(fmt.Sprintf("could not read png: %s", file_path))
 	}
 
 	bounds := img.Bounds()
