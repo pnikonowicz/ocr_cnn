@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"image/png"
-	"math"
 	"ocr_cnn/pkg/common"
 	"ocr_cnn/pkg/neuron"
 	"os"
@@ -38,29 +37,10 @@ func main() {
 	layerSize := resolutionX * resolutionY
 	const numberOfHiddenLayers = 2
 
-	var inputLayer []neuron.Neuron
-	var hiddenLayers [][]neuron.Neuron
-	var outputLayer []neuron.Neuron
+	ann := neuron.CreateANN(layerSize, numberOfHiddenLayers)
 
-	for range layerSize {
-		inputLayer = append(inputLayer, neuron.Neuron{})
-	}
-
-	for i := 1; i <= numberOfHiddenLayers; i++ {
-		reductionDivisior := int(math.Pow(2, float64(i)))
-		var hiddenLayer []neuron.Neuron
-		for range len(inputLayer) / reductionDivisior {
-			hiddenLayer = append(hiddenLayer, neuron.Neuron{})
-		}
-		hiddenLayers = append(hiddenLayers, hiddenLayer)
-	}
-
-	for i := 0; i < 10; i++ {
-		outputLayer = append(outputLayer, neuron.Neuron{})
-	}
-
-	fmt.Printf("created %d input layer neurons\n", len(inputLayer))
-	fmt.Printf("created %d first hidden layer neurons\n", len(hiddenLayers[0]))
-	fmt.Printf("created %d second hidden layer neurons\n", len(hiddenLayers[1]))
-	fmt.Printf("created %d output layer neurons\n", len(outputLayer))
+	fmt.Printf("created %d input layer neurons\n", len(ann.InputLayer))
+	fmt.Printf("created %d first hidden layer neurons\n", len(ann.HiddenLayers[0]))
+	fmt.Printf("created %d second hidden layer neurons\n", len(ann.HiddenLayers[1]))
+	fmt.Printf("created %d output layer neurons\n", len(ann.OutputLayer))
 }
