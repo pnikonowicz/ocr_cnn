@@ -36,12 +36,12 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 				t.Errorf("bias should be random %f", neuron.Bias)
 			}
 
-			for _, previousEdge := range neuron.NeighborsFrom {
+			for _, previousEdge := range neuron.Input {
 				if previousEdge.Weight != randomNumber {
 					t.Errorf("previous edge weight should be random %f", previousEdge.Weight)
 				}
 			}
-			for _, nextEdge := range neuron.NeighborsTo {
+			for _, nextEdge := range neuron.Output {
 				if nextEdge.Weight != randomNumber {
 					t.Errorf("next edge weight should be random %f", nextEdge.Weight)
 				}
@@ -52,13 +52,13 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 
 		nextLayerMap := map[*Neuron]bool{}
 		{ // setup next layer
-			for _, nextEdge := range currentLayer[0].NeighborsTo {
+			for _, nextEdge := range currentLayer[0].Output {
 				nextLayerMap[nextEdge.Neuron] = true
 			}
 		}
 		{ // assert that every next edge points to the same set of next layer neurons
 			for _, neuron := range currentLayer {
-				for _, edge := range neuron.NeighborsTo {
+				for _, edge := range neuron.Output {
 					_, nextNeuronExists := nextLayerMap[edge.Neuron]
 					if !nextNeuronExists {
 						t.Errorf("a neuron for the next layer was not shared. all edges from one layer should point to the same set of neurons in the next layer")
@@ -68,7 +68,7 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 		}
 		{ // assert that all previous edges points to the same set of previous layer neurons
 			for _, neuron := range currentLayer {
-				for _, previousEdge := range neuron.NeighborsFrom {
+				for _, previousEdge := range neuron.Input {
 					_, previousNeuronExists := previousLayerMap[previousEdge.Neuron]
 					if !previousNeuronExists {
 						t.Errorf("could not find the neuron in previous layer. should be connected")

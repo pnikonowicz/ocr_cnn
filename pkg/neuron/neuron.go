@@ -11,10 +11,10 @@ type Edge struct {
 }
 
 type Neuron struct {
-	NeighborsFrom []*Edge
-	NeighborsTo   []*Edge
-	Bias          float32
-	Activation    float32
+	Input      []*Edge
+	Output     []*Edge
+	Bias       float32
+	Activation float32
 }
 
 type ANN struct {
@@ -46,9 +46,9 @@ func CreateANN(layerSize, numberOfHiddenLayers int) ANN {
 		var neighborEdges []*Edge
 
 		outputLayer = append(outputLayer, &Neuron{
-			Activation:    0.0,
-			NeighborsTo:   nil,
-			NeighborsFrom: neighborEdges,
+			Activation: 0.0,
+			Output:     nil,
+			Input:      neighborEdges,
 		})
 	}
 
