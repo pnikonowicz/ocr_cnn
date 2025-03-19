@@ -1,13 +1,13 @@
 package neuron
 
 import (
-	"maps"
 	"testing"
 )
 
 func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 	const randomNumber = 1.2
 	ann := CreateANN(2, 1)
+	expectedLayerSizes := []int{2, 1, 10}
 
 	ann.RandomFunc = func() float32 {
 		return randomNumber
@@ -46,21 +46,16 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 				}
 			}
 
-			nextPreviousLayerMap[neuron] = true
-		}
-
-		nextLayerMap := map[*Neuron]bool{}
-		{ // setup next layer
-			for _, nextEdge := range currentLayer[0].Output {
-				nextLayerMap[nextEdge.Neuron] = true
+			for _, nextNeuron := range neuron.Output {
+				nextPreviousLayerMap[nextNeuron.Neuron] = true
 			}
 		}
 
-		currentLayer = []*Neuron{}
-		{ // setup the next layer
-			for neuron := range maps.Keys(nextLayerMap) {
-				currentLayer = append(currentLayer, neuron)
-			}
+		var expectedLayerSize int
+		expectedLayerSize, expectedLayerSizes = expectedLayerSizes[0], expectedLayerSizes[1:]
+		if len(nextPreviousLayerMap) != expectedLayerSize {
+			t.Errorf("layer size %d does not match expected size %d", len(nextPreviousLayerMap), expectedLayerSize)
+			return
 		}
 	}
 }
