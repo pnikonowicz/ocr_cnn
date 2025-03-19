@@ -1,17 +1,17 @@
 package neuron
 
 import (
+	"maps"
 	"testing"
 )
 
 func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 	const randomNumber = 1.2
-	ann := CreateANN(2, 1)
-	expectedLayerSizes := []int{2, 1, 10}
-
-	ann.RandomFunc = func() float32 {
+	randomFunc := func() float32 {
 		return randomNumber
 	}
+	ann := CreateANN(randomFunc, 2, 1)
+	expectedLayerSizes := []int{2, 1, 10}
 
 	currentLayer := ann.InputLayer
 
@@ -21,7 +21,7 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 	}
 
 	for len(currentLayer) > 0 {
-		nextPreviousLayerMap := map[*Neuron]bool{}
+		nextLayerMap := map[*Neuron]bool{}
 
 		for _, neuron := range currentLayer { // assert that all values are random
 			if neuron == nil {
@@ -36,26 +36,30 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 			}
 
 			for _, previousEdge := range neuron.Input {
-				if previousEdge.Weight != randomNumber {
+				if previousEdge.Weight.Value != randomNumber {
 					t.Errorf("previous edge weight should be random %f", previousEdge.Weight)
 				}
 			}
 			for _, nextEdge := range neuron.Output {
-				if nextEdge.Weight != randomNumber {
+				if nextEdge.Weight.Value != randomNumber {
 					t.Errorf("next edge weight should be random %f", nextEdge.Weight)
 				}
 			}
-
 			for _, nextNeuron := range neuron.Output {
-				nextPreviousLayerMap[nextNeuron.Neuron] = true
+				nextLayerMap[nextNeuron.Neuron] = true
 			}
 		}
 
 		var expectedLayerSize int
 		expectedLayerSize, expectedLayerSizes = expectedLayerSizes[0], expectedLayerSizes[1:]
-		if len(nextPreviousLayerMap) != expectedLayerSize {
-			t.Errorf("layer size %d does not match expected size %d", len(nextPreviousLayerMap), expectedLayerSize)
+		if len(currentLayer) != expectedLayerSize {
+			t.Errorf("layer size %d does not match expected size %d", len(nextLayerMap), expectedLayerSize)
 			return
+		}
+
+		currentLayer = []*Neuron{}
+		for neuron := range maps.Keys(nextLayerMap) { // setup next layer
+			currentLayer = append(currentLayer, neuron)
 		}
 	}
 }

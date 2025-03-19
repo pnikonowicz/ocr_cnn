@@ -2,11 +2,14 @@ package neuron
 
 import (
 	"math"
-	"math/rand"
 )
 
+type Weight struct {
+	Value float32
+}
+
 type Edge struct {
-	Weight float32
+	Weight *Weight
 	Neuron *Neuron
 }
 
@@ -19,44 +22,56 @@ type Neuron struct {
 
 type ANN struct {
 	InputLayer   []*Neuron
-	HiddenLayers [][]*Neuron
 	OutputLayer  []*Neuron
-	RandomFunc   func() float32
 }
 
-func CreateANN(layerSize, numberOfHiddenLayers int) ANN {
-	var inputLayer []*Neuron
-	var hiddenLayers [][]*Neuron
-	var outputLayer []*Neuron
-
-	for range layerSize {
-		inputLayer = append(inputLayer, &Neuron{})
-	}
-
-	for i := 1; i <= numberOfHiddenLayers; i++ {
-		reductionDivisior := int(math.Pow(2, float64(i)))
-		var hiddenLayer []*Neuron
-		for range len(inputLayer) / reductionDivisior {
-			hiddenLayer = append(hiddenLayer, &Neuron{})
+func CreateANN(randomFunc func() float32, inputLayerSize, numberOfHiddenLayers int) ANN {
+	layerSizes := []int{}
+	{ // plot the size of each layer
+		layerSizes = append(layerSizes, inputLayerSize)
+		for i := 1; i <= numberOfHiddenLayers; i++ {
+			reductionDivisior := int(math.Pow(2, float64(i)))
+			layerSizes = append(layerSizes, inputLayerSize / reductionDivisior)
 		}
-		hiddenLayers = append(hiddenLayers, hiddenLayer)
+		layerSizes = append(layerSizes, 10)
 	}
 
-	for i := 0; i < 10; i++ {
-		var neighborEdges []*Edge
+	var firstLayer []*Neuron
+	lastLayer := []*Neuron{}
 
-		outputLayer = append(outputLayer, &Neuron{
-			Activation: 0.0,
-			Output:     nil,
-			Input:      neighborEdges,
-		})
+	for _, layerSize := range(layerSizes) {
+		var currentLayer []*Neuron
+		for range layerSize {
+			currentLayer = append(currentLayer, &Neuron{
+				Activation: 0,
+				Bias: randomFunc(),
+				Input: nil, // we fill this in below
+				Output: nil, // we fill this in below
+			})
+		}
+
+		for _, lastNeuron := range(lastLayer) { // connect the graph bipartite
+			for _, currentNeuron := range(currentLayer) {
+				weight := Weight {Value: randomFunc() }
+				lastNeuron.Output = append(lastNeuron.Output, &Edge {
+					Neuron: currentNeuron,
+					Weight: &weight,
+				})
+				currentNeuron.Input = append(currentNeuron.Input, &Edge {
+					Neuron: lastNeuron,
+					Weight: &weight,
+				})
+			}
+		}
+		lastLayer = currentLayer
+		if firstLayer == nil {
+			firstLayer = currentLayer
+		}
 	}
 
 	ann := ANN{
-		InputLayer:   inputLayer,
-		HiddenLayers: hiddenLayers,
-		OutputLayer:  outputLayer,
-		RandomFunc:   rand.Float32,
+		InputLayer:   firstLayer,
+		OutputLayer:  lastLayer,
 	}
 
 	return ann
