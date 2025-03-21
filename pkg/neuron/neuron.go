@@ -1,6 +1,7 @@
 package neuron
 
 import (
+	"fmt"
 	"math"
 	"ocr_cnn/pkg/common"
 )
@@ -98,5 +99,27 @@ func (ann *ANN) ForwardPropagation() {
 		}
 
 		currentLayer = nextLayer
+	}
+}
+
+func (ann *ANN) Print(bindFunc func(string)) {
+	currentLayer := ann.InputLayer
+
+	for len(currentLayer) > 0 {
+		nextLayer := map[*Neuron] bool {}
+		currentLayerString := ""
+		for _, node := range currentLayer {
+			currentLayerString += fmt.Sprintf("Neuron(%f) | ", node.Activation)
+			for _, nextNode := range node.Output {
+				nextLayer[nextNode.Neuron] = true
+			}
+		}
+
+		bindFunc(currentLayerString)
+
+		currentLayer = []*Neuron{}
+		for node := range nextLayer {
+			currentLayer = append(currentLayer, node)
+		}
 	}
 }
