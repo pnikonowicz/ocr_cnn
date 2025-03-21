@@ -76,3 +76,6 @@ func CreateANN(randomFunc func() float32, inputLayerSize, numberOfHiddenLayers i
 
 	return ann
 }
+
+func (*ANN) ForwardPropagation() {
+}

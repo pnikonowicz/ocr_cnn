@@ -63,3 +63,67 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 		}
 	}
 }
+
+func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
+	inputNeuronA := Neuron {
+		Bias: float32(.1),
+		Activation: float32(.2),
+	}
+	inputNeuronB := Neuron {
+		Bias: float32(.3),
+		Activation: float32(.4),
+	}
+	outputNeuronA := Neuron {
+		Bias: float32(.5),
+	}
+	outputNeuronB := Neuron {
+		Bias: float32(.6),
+	}
+
+	{ 
+		// connect network
+		inputNeuronA.Output = []*Edge{ 
+			&Edge {
+				Weight: &Weight{Value: float32(.7)},
+				Neuron: &outputNeuronA,
+			},
+			&Edge {
+				Weight: &Weight{Value: float32(.8)},
+				Neuron: &outputNeuronB,
+			},
+		}
+		inputNeuronB.Output = []*Edge {
+			&Edge {
+				Weight: &Weight{Value: float32(.8)},
+				Neuron: &outputNeuronA,
+			},
+			&Edge {
+				Weight: &Weight{Value: float32(.9)},
+				Neuron: &outputNeuronB,
+			},
+		}
+	}
+
+	expectedActivations := map[*Neuron]float32 {
+		&outputNeuronA: float32(1),
+		&outputNeuronB: float32(1),
+	}
+
+	ann := &ANN {
+		InputLayer: []*Neuron {
+			&inputNeuronA, &inputNeuronB,
+		},
+		OutputLayer: []*Neuron {
+			&outputNeuronA, &outputNeuronB,
+		},
+	}
+
+	ann.ForwardPropagation()
+
+	for _, outputNode := range(ann.OutputLayer) {
+		expectedActivation := expectedActivations[outputNode]
+		if outputNode.Activation != expectedActivation {
+			t.Fatalf("expected %f but got %f", expectedActivation, outputNode.Activation)
+		}
+	}
+}
