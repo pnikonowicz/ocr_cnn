@@ -2,6 +2,7 @@ package neuron
 
 import (
 	"math"
+	"ocr_cnn/pkg/common"
 )
 
 type Weight struct {
@@ -77,5 +78,25 @@ func CreateANN(randomFunc func() float32, inputLayerSize, numberOfHiddenLayers i
 	return ann
 }
 
-func (*ANN) ForwardPropagation() {
+func (ann *ANN) ForwardPropagation() {
+	currentLayer := ann.InputLayer
+
+	for len(currentLayer) > 0 {
+		activations := map[*Neuron]float32 {}
+
+		for _, inputNeuron := range currentLayer {
+			for _, inputNeuronEdge := range(inputNeuron.Output) {
+				outputNeuron := inputNeuronEdge.Neuron
+				activations[outputNeuron] += inputNeuronEdge.Weight.Value * inputNeuron.Activation
+			}
+		}
+
+		nextLayer := []*Neuron {}
+		for outputNeuron, activation := range activations {
+			outputNeuron.Activation = common.ReLU(activation + outputNeuron.Bias)
+			nextLayer = append(nextLayer, outputNeuron)
+		}
+
+		currentLayer = nextLayer
+	}
 }
