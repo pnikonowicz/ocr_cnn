@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"image/png"
-	"math/rand"
 	"ocr_cnn/pkg/common"
 	"ocr_cnn/pkg/neuron"
 	"os"
@@ -38,11 +37,11 @@ func main() {
 	layerSize := resolutionX * resolutionY
 	const numberOfHiddenLayers = 2
 
-	ann := neuron.CreateANN(rand.Float32, layerSize, numberOfHiddenLayers)
+	ann := neuron.CreateANN(common.RandomUniformDistrbution(-1, 1), layerSize, numberOfHiddenLayers)
 
 	fmt.Printf("created %d input layer neurons\n", len(ann.InputLayer))
 	firstHiddenLayer := map[*neuron.Neuron]bool{}
-	for _, edge := range(ann.InputLayer[0].Output) {
+	for _, edge := range ann.InputLayer[0].Output {
 		firstHiddenLayer[edge.Neuron] = true
 	}
 
