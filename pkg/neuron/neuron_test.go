@@ -2,6 +2,7 @@ package neuron
 
 import (
 	"maps"
+	"ocr_cnn/pkg/common"
 	"testing"
 )
 
@@ -65,65 +66,73 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 }
 
 func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
-	inputNeuronA := Neuron {
-		Bias: float32(.1),
-		Activation: float32(.2),
+	outputBiasA := float32(.1)
+	outputBiasB := float32(.2)
+	inputActivationA := float32(.3)
+	inputActivationB := float32(.4)
+
+	inputNeuronA := Neuron{
+		Activation: float32(inputActivationA),
 	}
-	inputNeuronB := Neuron {
-		Bias: float32(.3),
-		Activation: float32(.4),
+	inputNeuronB := Neuron{
+		Activation: float32(inputActivationB),
 	}
-	outputNeuronA := Neuron {
-		Bias: float32(.5),
+	outputNeuronA := Neuron{
+		Bias: float32(outputBiasA),
 	}
-	outputNeuronB := Neuron {
-		Bias: float32(.6),
+	outputNeuronB := Neuron{
+		Bias: float32(outputBiasB),
 	}
 
-	{ 
+	weightAtoA := float32(.5)
+	weightAtoB := float32(.6)
+	weightBtoA := float32(.7)
+	weightBtoB := float32(.8)
+
+	{
 		// connect network
-		inputNeuronA.Output = []*Edge{ 
-			&Edge {
-				Weight: &Weight{Value: float32(.7)},
+		inputNeuronA.Output = []*Edge{
+			{
+				Weight: &Weight{Value: float32(weightAtoA)},
 				Neuron: &outputNeuronA,
 			},
-			&Edge {
-				Weight: &Weight{Value: float32(.8)},
+			{
+				Weight: &Weight{Value: float32(weightAtoB)},
 				Neuron: &outputNeuronB,
 			},
 		}
-		inputNeuronB.Output = []*Edge {
-			&Edge {
-				Weight: &Weight{Value: float32(.8)},
+		inputNeuronB.Output = []*Edge{
+			{
+				Weight: &Weight{Value: float32(weightBtoA)},
 				Neuron: &outputNeuronA,
 			},
-			&Edge {
-				Weight: &Weight{Value: float32(.9)},
+			{
+				Weight: &Weight{Value: float32(weightBtoB)},
 				Neuron: &outputNeuronB,
 			},
 		}
 	}
 
-	expectedActivations := map[*Neuron]float32 {
-		&outputNeuronA: float32(1),
-		&outputNeuronB: float32(1),
+	expectedActivations := map[*Neuron]float32{
+		&outputNeuronA: common.ReLU((weightAtoA * inputActivationA) + (weightBtoA * inputActivationB) + outputBiasA),
+		&outputNeuronB: common.ReLU((weightBtoB * inputActivationB) + (weightAtoB * inputActivationA) + outputBiasB),
 	}
 
-	ann := &ANN {
-		InputLayer: []*Neuron {
+	ann := &ANN{
+		InputLayer: []*Neuron{
 			&inputNeuronA, &inputNeuronB,
 		},
-		OutputLayer: []*Neuron {
+		OutputLayer: []*Neuron{
 			&outputNeuronA, &outputNeuronB,
 		},
 	}
 
 	ann.ForwardPropagation()
 
-	for _, outputNode := range(ann.OutputLayer) {
+	for i, outputNode := range ann.OutputLayer {
 		expectedActivation := expectedActivations[outputNode]
 		if outputNode.Activation != expectedActivation {
-			t.Fatalf("expected %f but got %f", expectedActivation, outputNode.Activation)
+			t.Fatalf("activation %d: expected %f but got %f", i, expectedActivation, outputNode.Activation)
 		}
 	}
 }
