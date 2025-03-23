@@ -1,9 +1,9 @@
 # TODO
 
-## read image and translate to flattened array
+## read image and translate to input activation vector
 
-## forward propagation
+given an image, convert values to the input vector
 
-test needs to be tuned to match implementation
+## back propagation
 
 ## cost function
