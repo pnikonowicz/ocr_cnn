@@ -68,54 +68,92 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 	outputBiasA := float32(.1)
 	outputBiasB := float32(.2)
-	inputActivationA := float32(.3)
-	inputActivationB := float32(.4)
+	hiddenBiasA := float32(.3)
+	hiddenBiasB := float32(.4)
+
+	inputActivationA := float32(.5)
+	inputActivationB := float32(.6)
 
 	inputNeuronA := Neuron{
-		Activation: float32(inputActivationA),
+		Activation: inputActivationA,
 	}
 	inputNeuronB := Neuron{
-		Activation: float32(inputActivationB),
+		Activation: inputActivationB,
+	}
+	hiddenNeuronA := Neuron{
+		Bias: hiddenBiasA,
+	}
+	hiddenNeuronB := Neuron{
+		Bias: hiddenBiasB,
 	}
 	outputNeuronA := Neuron{
-		Bias: float32(outputBiasA),
+		Bias: outputBiasA,
 	}
 	outputNeuronB := Neuron{
-		Bias: float32(outputBiasB),
+		Bias: outputBiasB,
 	}
 
-	weightAtoA := float32(.5)
-	weightAtoB := float32(.6)
-	weightBtoA := float32(.7)
-	weightBtoB := float32(.8)
+	weightInputAtoHiddenA := float32(.7)
+	weightInputAtoHiddenB := float32(.8)
+	weightInputBtoHiddenA := float32(.9)
+	weightInputBtoHiddenB := float32(.01)
+	weightHiddenAtoOutputA := float32(.02)
+	weightHiddenAtoOutputB := float32(.03)
+	weightHiddenBtoOutputA := float32(.04)
+	weightHiddenBtoOutputB := float32(.05)
 
 	{
 		// connect network
 		inputNeuronA.Output = []*Edge{
 			{
-				Weight: &Weight{Value: float32(weightAtoA)},
-				Neuron: &outputNeuronA,
+				Weight: &Weight{Value: float32(weightInputAtoHiddenA)},
+				Neuron: &hiddenNeuronA,
 			},
 			{
-				Weight: &Weight{Value: float32(weightAtoB)},
-				Neuron: &outputNeuronB,
+				Weight: &Weight{Value: float32(weightInputAtoHiddenB)},
+				Neuron: &hiddenNeuronB,
 			},
 		}
 		inputNeuronB.Output = []*Edge{
 			{
-				Weight: &Weight{Value: float32(weightBtoA)},
+				Weight: &Weight{Value: float32(weightInputBtoHiddenA)},
+				Neuron: &hiddenNeuronA,
+			},
+			{
+				Weight: &Weight{Value: float32(weightInputBtoHiddenB)},
+				Neuron: &hiddenNeuronB,
+			},
+		}
+		hiddenNeuronA.Output = []*Edge{
+			{
+				Weight: &Weight{Value: float32(weightHiddenAtoOutputA)},
 				Neuron: &outputNeuronA,
 			},
 			{
-				Weight: &Weight{Value: float32(weightBtoB)},
+				Weight: &Weight{Value: float32(weightHiddenAtoOutputB)},
+				Neuron: &outputNeuronB,
+			},
+		}
+		hiddenNeuronB.Output = []*Edge{
+			{
+				Weight: &Weight{Value: float32(weightHiddenBtoOutputA)},
+				Neuron: &outputNeuronA,
+			},
+			{
+				Weight: &Weight{Value: float32(weightHiddenBtoOutputB)},
 				Neuron: &outputNeuronB,
 			},
 		}
 	}
 
+	expectedHiddenActivationA := common.ReLU((weightInputAtoHiddenA * inputActivationA) + (weightInputBtoHiddenA * inputActivationB) + hiddenBiasA)
+	expectedHiddenActivationB := common.ReLU((weightInputBtoHiddenB * inputActivationB) + (weightInputAtoHiddenB * inputActivationA) + hiddenBiasB)
+
 	expectedActivations := map[*Neuron]float32{
-		&outputNeuronA: common.ReLU((weightAtoA * inputActivationA) + (weightBtoA * inputActivationB) + outputBiasA),
-		&outputNeuronB: common.ReLU((weightBtoB * inputActivationB) + (weightAtoB * inputActivationA) + outputBiasB),
+		&hiddenNeuronA: expectedHiddenActivationA,
+		&hiddenNeuronB: expectedHiddenActivationB,
+		&outputNeuronA: common.ReLU((weightHiddenAtoOutputA * expectedHiddenActivationA) + (weightHiddenBtoOutputA * expectedHiddenActivationB) + outputBiasA),
+		&outputNeuronB: common.ReLU((weightHiddenBtoOutputB * expectedHiddenActivationB) + (weightHiddenAtoOutputB * expectedHiddenActivationA) + outputBiasB),
 	}
 
 	ann := &ANN{
