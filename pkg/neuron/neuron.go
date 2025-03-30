@@ -80,26 +80,53 @@ func CreateANN(randomFunc func() float32, inputLayerSize, numberOfHiddenLayers i
 }
 
 func (ann *ANN) ForwardPropagation() {
-	currentLayer := ann.InputLayer
+	calculateHiddenLayerActivations := func(inputLayer []*Neuron) {
+		currentLayer := inputLayer
 
-	for len(currentLayer) > 0 {
-		activations := map[*Neuron]float32{}
+		for len(currentLayer) > 0 {
+			activations := map[*Neuron]float32{}
 
-		for _, inputNeuron := range currentLayer {
-			for _, inputNeuronEdge := range inputNeuron.Output {
-				outputNeuron := inputNeuronEdge.Neuron
-				activations[outputNeuron] += (inputNeuronEdge.Weight.Value * inputNeuron.Activation)
+			for _, inputNeuron := range currentLayer {
+				for _, inputNeuronEdge := range inputNeuron.Output {
+					outputNeuron := inputNeuronEdge.Neuron
+					activations[outputNeuron] += (inputNeuronEdge.Weight.Value * inputNeuron.Activation)
+				}
 			}
-		}
 
-		nextLayer := []*Neuron{}
-		for outputNeuron, activation := range activations {
-			outputNeuron.Activation = common.ReLU(activation + outputNeuron.Bias)
-			nextLayer = append(nextLayer, outputNeuron)
-		}
+			nextLayer := []*Neuron{}
+			for outputNeuron, activation := range activations {
+				outputNeuron.Activation = common.ReLU(activation + outputNeuron.Bias)
+				nextLayer = append(nextLayer, outputNeuron)
+			}
 
-		currentLayer = nextLayer
+			currentLayer = nextLayer
+		}
 	}
+
+	calculateOutputLayerActivations := func(outputLayer []*Neuron) {
+		logits := make([]float32, len(outputLayer))
+
+		for i, neuron := range outputLayer {
+			logit := float32(0)
+			for _, inputNeuron := range neuron.Input {
+				activation := inputNeuron.Neuron.Activation
+				weight := inputNeuron.Weight.Value
+
+				logit += (activation * weight)
+
+			}
+			bias := neuron.Bias
+
+			logits[i] = logit + bias
+		}
+
+		for i, neuron := range outputLayer {
+			neuron.Activation = common.SoftMax(logits[i], logits)
+		}
+	}
+
+	calculateHiddenLayerActivations(ann.InputLayer)
+	calculateOutputLayerActivations(ann.OutputLayer)
 }
 
 func (ann *ANN) Print(bindFunc func(string)) {

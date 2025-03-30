@@ -144,16 +144,61 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 				Neuron: &outputNeuronB,
 			},
 		}
+		hiddenNeuronA.Input = []*Edge{
+			{
+				Weight: inputNeuronA.Output[0].Weight,
+				Neuron: &inputNeuronA,
+			},
+			{
+				Weight: inputNeuronB.Output[0].Weight,
+				Neuron: &inputNeuronB,
+			},
+		}
+		hiddenNeuronB.Input = []*Edge{
+			{
+				Weight: inputNeuronA.Output[1].Weight,
+				Neuron: &inputNeuronA,
+			},
+			{
+				Weight: inputNeuronB.Output[1].Weight,
+				Neuron: &inputNeuronB,
+			},
+		}
+		outputNeuronA.Input = []*Edge{
+			{
+				Weight: hiddenNeuronA.Output[0].Weight,
+				Neuron: &hiddenNeuronA,
+			},
+			{
+				Weight: hiddenNeuronB.Output[0].Weight,
+				Neuron: &hiddenNeuronB,
+			},
+		}
+		outputNeuronB.Input = []*Edge{
+			{
+				Weight: hiddenNeuronA.Output[1].Weight,
+				Neuron: &hiddenNeuronA,
+			},
+			{
+				Weight: hiddenNeuronB.Output[1].Weight,
+				Neuron: &hiddenNeuronB,
+			},
+		}
 	}
 
 	expectedHiddenActivationA := common.ReLU((weightInputAtoHiddenA * inputActivationA) + (weightInputBtoHiddenA * inputActivationB) + hiddenBiasA)
 	expectedHiddenActivationB := common.ReLU((weightInputBtoHiddenB * inputActivationB) + (weightInputAtoHiddenB * inputActivationA) + hiddenBiasB)
 
+	logits := []float32{
+		(expectedHiddenActivationA * weightHiddenAtoOutputA) + (expectedHiddenActivationB * weightHiddenBtoOutputA) + outputBiasA,
+		(expectedHiddenActivationA * weightHiddenAtoOutputB) + (expectedHiddenActivationB * weightHiddenBtoOutputB) + outputBiasB,
+	}
+
 	expectedActivations := map[*Neuron]float32{
 		&hiddenNeuronA: expectedHiddenActivationA,
 		&hiddenNeuronB: expectedHiddenActivationB,
-		&outputNeuronA: common.ReLU((weightHiddenAtoOutputA * expectedHiddenActivationA) + (weightHiddenBtoOutputA * expectedHiddenActivationB) + outputBiasA),
-		&outputNeuronB: common.ReLU((weightHiddenBtoOutputB * expectedHiddenActivationB) + (weightHiddenAtoOutputB * expectedHiddenActivationA) + outputBiasB),
+		&outputNeuronA: common.SoftMax(logits[0], logits),
+		&outputNeuronB: common.SoftMax(logits[1], logits),
 	}
 
 	ann := &ANN{

@@ -25,3 +25,15 @@ func RandomUniformDistrbution(min, max float32) func() float32 {
 func ReLU(x float32) float32 {
 	return float32(math.Max(float64(x), float64(0)))
 }
+
+func SoftMax(inputScoreLogit float32, logits []float32) float32 {
+	exponentiation := float64(0)
+
+	for _, logit := range logits {
+		exponentiation += math.Exp(float64(logit))
+	}
+
+	normalization := math.Exp(float64(inputScoreLogit)) / exponentiation
+
+	return float32(normalization)
+}
