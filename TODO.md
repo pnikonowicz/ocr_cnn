@@ -4,6 +4,10 @@
 
 given an image, convert values to the input vector
 
+## input layer
+
+* use one hot encoding strategy to convert image into input vector
+
 ## forward propagation
 
 * no activation function should be used on input layer
