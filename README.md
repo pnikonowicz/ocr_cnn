@@ -1,4 +1,4 @@
-# Optical Character Recognition via a Convolution Neural Network
+# Optical Character Recognition via an Artificial Neural Network
 
 Uses one hot encoding to translate a list of 10 arabic numeral images (0-9) and classify them into the cooresponding digit.
 
