@@ -1,10 +1,14 @@
 package common
 
 import (
+	"bytes"
 	"fmt"
+	"image"
+	"image/png"
 	"math"
 	"math/rand/v2"
 	"os"
+	"path"
 )
 
 func Log(message string) {
@@ -36,4 +40,30 @@ func SoftMax(inputScoreLogit float32, logits []float32) float32 {
 	normalization := math.Exp(float64(inputScoreLogit)) / exponentiation
 
 	return float32(normalization)
+}
+
+func GetImage(number string, idx int) image.Image {
+	wd, _ := os.Getwd()
+	dataset_dir := path.Join(wd, "translated_dataset")
+
+	dir := path.Join(dataset_dir, number)
+	dir_iterator, err := os.ReadDir(dir)
+
+	if err != nil {
+		PrintAndTerminate("could not read dir")
+	}
+
+	file_name := path.Join(dir, dir_iterator[idx].Name())
+	file_contents, err := os.ReadFile(file_name)
+
+	if err != nil {
+		PrintAndTerminate(fmt.Sprintf("could not read file: %s", file_name))
+	}
+
+	img, err := png.Decode(bytes.NewReader(file_contents))
+	if err != nil {
+		PrintAndTerminate(fmt.Sprintf("could not read png: %s", file_name))
+	}
+
+	return img
 }

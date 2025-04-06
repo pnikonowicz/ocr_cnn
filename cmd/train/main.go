@@ -48,4 +48,12 @@ func main() {
 	common.Log(fmt.Sprintf("created %d first hidden layer neurons", len(ann.InputLayer[0].Output)))
 	common.Log(fmt.Sprintf("created %d second hidden layer neurons", len(ann.OutputLayer[0].Input)))
 	common.Log(fmt.Sprintf("created %d output layer neurons", len(ann.OutputLayer)))
+
+	common.Log("loading an image")
+	img := common.GetImage("0", 0)
+
+	common.Log("encode image")
+	ann.InputEncoding(img)
+
+	common.Log("done")
 }
