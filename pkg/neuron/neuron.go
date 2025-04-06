@@ -2,6 +2,8 @@ package neuron
 
 import (
 	"fmt"
+	"image"
+	"image/color"
 	"math"
 	"ocr_cnn/pkg/common"
 )
@@ -127,6 +129,29 @@ func (ann *ANN) ForwardPropagation() {
 
 	calculateHiddenLayerActivations(ann.InputLayer)
 	calculateOutputLayerActivations(ann.OutputLayer)
+}
+
+func colorsEqual(c1, c2 color.Color) bool {
+	r1, g1, b1, a1 := c1.RGBA()
+	r2, g2, b2, a2 := c2.RGBA()
+	return r1 == r2 && g1 == g2 && b1 == b2 && a1 == a2
+}
+
+func (ann *ANN) InputEncoding(img image.Image) {
+	bounds := img.Bounds()
+
+	for x := bounds.Min.X; x < bounds.Max.X; x++ {
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			neuronIdx := (x * bounds.Max.X) + y
+			neuron := ann.InputLayer[neuronIdx]
+
+			if colorsEqual(color.Black, img.At(x, y)) {
+				neuron.Activation = 0
+			} else {
+				neuron.Activation = 1
+			}
+		}
+	}
 }
 
 func (ann *ANN) Print(bindFunc func(string)) {

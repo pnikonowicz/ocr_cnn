@@ -1,6 +1,8 @@
 package neuron
 
 import (
+	"image"
+	"image/color"
 	"maps"
 	"ocr_cnn/pkg/common"
 	"testing"
@@ -223,6 +225,48 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 		expectedActivation := expectedActivations[inputNode]
 		if inputNode.Activation != expectedActivation {
 			t.Fatalf("input activation %d: expected %f but got %f", i, expectedActivation, inputNode.Activation)
+		}
+	}
+}
+
+func TestInputEncoding(t *testing.T) {
+	expectedColorBlack := color.RGBA{0, 0, 0, 255}
+	expectedColorWhite := color.RGBA{255, 255, 255, 255}
+
+	neuronA := &Neuron{}
+	neuronB := &Neuron{}
+	neuronC := &Neuron{}
+	neuronD := &Neuron{}
+
+	ann := &ANN{
+		InputLayer: []*Neuron{
+			neuronA,
+			neuronB,
+			neuronC,
+			neuronD,
+		},
+	}
+
+	img := image.NewRGBA(image.Rect(0, 0, 2, 2))
+
+	img.Set(0, 0, expectedColorBlack)
+	img.Set(0, 1, expectedColorWhite)
+	img.Set(1, 0, expectedColorWhite)
+	img.Set(1, 1, expectedColorBlack)
+
+	ann.InputEncoding(img)
+
+	expectedActivations := map[*Neuron]float32{
+		neuronA: 0,
+		neuronB: 1,
+		neuronC: 1,
+		neuronD: 0,
+	}
+
+	for i, neuron := range ann.InputLayer {
+		expectedActivation := expectedActivations[neuron]
+		if expectedActivation != neuron.Activation {
+			t.Errorf("expected pixel %f but received %f at neuron %d", expectedActivation, neuron.Activation, i)
 		}
 	}
 }
