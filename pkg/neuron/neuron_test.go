@@ -195,8 +195,8 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 	}
 
 	expectedActivations := map[*Neuron]float32{
-		&hiddenNeuronA: expectedHiddenActivationA,
-		&hiddenNeuronB: expectedHiddenActivationB,
+		&inputNeuronA:  inputActivationA,
+		&inputNeuronB:  inputActivationB,
 		&outputNeuronA: common.SoftMax(logits[0], logits),
 		&outputNeuronB: common.SoftMax(logits[1], logits),
 	}
@@ -215,7 +215,14 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 	for i, outputNode := range ann.OutputLayer {
 		expectedActivation := expectedActivations[outputNode]
 		if outputNode.Activation != expectedActivation {
-			t.Fatalf("activation %d: expected %f but got %f", i, expectedActivation, outputNode.Activation)
+			t.Fatalf("output activation %d: expected %f but got %f", i, expectedActivation, outputNode.Activation)
+		}
+	}
+
+	for i, inputNode := range ann.InputLayer {
+		expectedActivation := expectedActivations[inputNode]
+		if inputNode.Activation != expectedActivation {
+			t.Fatalf("input activation %d: expected %f but got %f", i, expectedActivation, inputNode.Activation)
 		}
 	}
 }
