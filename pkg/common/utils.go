@@ -16,7 +16,7 @@ func PrintAndTerminate(message string) {
 	os.Exit(1)
 }
 
-func RandomUniformDistrbution(min, max float32) func() float32 {
+func RandomUniformDistrbutionFunc(min, max float32) func() float32 {
 	return func() float32 {
 		return min + (max-min)*rand.Float32()
 	}
