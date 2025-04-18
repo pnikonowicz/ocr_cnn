@@ -1,5 +1,8 @@
 # TODO
 
+## forward propagation bug
+
+* it appears as if we are overflowing on forward propagation  
 ## back propagation
 
 ### loss function
