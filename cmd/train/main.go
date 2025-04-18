@@ -55,5 +55,8 @@ func main() {
 	common.Log("encode image")
 	ann.InputEncoding(img)
 
+	common.Log("forward propagate")
+	ann.ForwardPropagation()
+
 	common.Log("done")
 }
