@@ -58,5 +58,10 @@ func main() {
 	common.Log("forward propagate")
 	ann.ForwardPropagation()
 
+	common.Log("output layer")
+	for i, neuron := range ann.OutputLayer {
+		common.Log(fmt.Sprintf("   %d: %f", i, neuron.Input[0].Neuron.Activation))
+	}
+
 	common.Log("done")
 }
