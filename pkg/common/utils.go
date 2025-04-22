@@ -39,14 +39,16 @@ func SoftMax(logits []float64) []float64 { // uses stable implementation
 	result := make([]float64, len(logits))
 	exponentiation := float64(0)
 	for i, logit := range logits {
-		result[i] = math.Exp(logit - maxLogit)
-		exp := result[i]
-
-		exponentiation += exp
+		reduced := logit - maxLogit
+		// Log(fmt.Sprintf("%f - %f = %f", logit, maxLogit, reduced))
+		result[i] = math.Exp(reduced)
+		// Log(fmt.Sprintf("exp: %f", result[i]))
+		exponentiation += result[i]
 	}
 
 	for i := range(len(logits)) {
 		inputScoreLogit := result[i]
+		// Log(fmt.Sprintf("%f / %f", inputScoreLogit, exponentiation))
 		result[i] = inputScoreLogit / exponentiation
 	}
 
