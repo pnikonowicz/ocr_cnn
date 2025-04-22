@@ -59,9 +59,12 @@ func main() {
 	ann.ForwardPropagation()
 
 	common.Log("output layer")
+	sum := float64(0)
 	for i, neuron := range ann.OutputLayer {
-		common.Log(fmt.Sprintf("   %d: %f", i, neuron.Input[0].Neuron.Activation))
+		sum += neuron.Activation
+		common.Log(fmt.Sprintf("   %d: %f", i, neuron.Activation))
 	}
+	common.Log(fmt.Sprintf("sum: %f", sum))
 
 	common.Log("done")
 }

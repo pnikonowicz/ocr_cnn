@@ -9,7 +9,7 @@ import (
 )
 
 type Weight struct {
-	Value float32
+	Value float64
 }
 
 type Edge struct {
@@ -20,8 +20,8 @@ type Edge struct {
 type Neuron struct {
 	Input      []*Edge
 	Output     []*Edge
-	Bias       float32
-	Activation float32
+	Bias       float64
+	Activation float64
 }
 
 type ANN struct {
@@ -29,7 +29,7 @@ type ANN struct {
 	OutputLayer []*Neuron
 }
 
-func CreateANN(randomFunc func() float32, inputLayerSize, numberOfHiddenLayers int) ANN {
+func CreateANN(randomFunc func() float64, inputLayerSize, numberOfHiddenLayers int) ANN {
 	layerSizes := []int{}
 	{ // plot the size of each layer
 		layerSizes = append(layerSizes, inputLayerSize)
@@ -48,7 +48,7 @@ func CreateANN(randomFunc func() float32, inputLayerSize, numberOfHiddenLayers i
 		for range layerSize {
 			currentLayer = append(currentLayer, &Neuron{
 				Activation: 0,
-				Bias:       randomFunc(),
+				Bias:       0,
 				Input:      nil, // we fill this in below
 				Output:     nil, // we fill this in below
 			})
@@ -86,7 +86,7 @@ func (ann *ANN) ForwardPropagation() {
 		currentLayer := inputLayer
 
 		for len(currentLayer) > 0 {
-			activations := map[*Neuron]float32{}
+			activations := map[*Neuron]float64{}
 
 			for _, inputNeuron := range currentLayer {
 				for _, inputNeuronEdge := range inputNeuron.Output {
@@ -106,24 +106,24 @@ func (ann *ANN) ForwardPropagation() {
 	}
 
 	calculateOutputLayerActivations := func(outputLayer []*Neuron) {
-		logits := make([]float32, len(outputLayer))
+		logits := make([]float64, len(outputLayer))
 
 		for i, neuron := range outputLayer {
-			logit := float32(0)
+			logit := float64(0)
 			for _, inputNeuron := range neuron.Input {
 				activation := inputNeuron.Neuron.Activation
 				weight := inputNeuron.Weight.Value
 
-				logit += (activation * weight)
+				logit += float64((activation * weight))
 
 			}
 			bias := neuron.Bias
 
-			logits[i] = logit + bias
+			logits[i] = logit + float64(bias)
 		}
 
-		for i, neuron := range outputLayer {
-			neuron.Activation = common.SoftMax(logits[i], logits)
+		for i, value := range common.SoftMax(logits) {
+			outputLayer[i].Activation = value
 		}
 	}
 

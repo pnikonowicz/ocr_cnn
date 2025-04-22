@@ -10,7 +10,7 @@ import (
 
 func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 	const randomNumber = 1.2
-	randomFunc := func() float32 {
+	randomFunc := func() float64 {
 		return randomNumber
 	}
 	ann := CreateANN(randomFunc, 2, 1)
@@ -34,8 +34,8 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 			if neuron.Activation != 0 {
 				t.Errorf("activation value should start at zero: %f", neuron.Activation)
 			}
-			if neuron.Bias != randomNumber {
-				t.Errorf("bias should be random %f", neuron.Bias)
+			if neuron.Bias != 0 {
+				t.Errorf("bias should be zero %f", neuron.Bias)
 			}
 
 			for _, previousEdge := range neuron.Input {
@@ -68,13 +68,13 @@ func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 }
 
 func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
-	outputBiasA := float32(.1)
-	outputBiasB := float32(.2)
-	hiddenBiasA := float32(.3)
-	hiddenBiasB := float32(.4)
+	outputBiasA := float64(.1)
+	outputBiasB := float64(.2)
+	hiddenBiasA := float64(.3)
+	hiddenBiasB := float64(.4)
 
-	inputActivationA := float32(.5)
-	inputActivationB := float32(.6)
+	inputActivationA := float64(.5)
+	inputActivationB := float64(.6)
 
 	inputNeuronA := Neuron{
 		Activation: inputActivationA,
@@ -95,54 +95,54 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 		Bias: outputBiasB,
 	}
 
-	weightInputAtoHiddenA := float32(.7)
-	weightInputAtoHiddenB := float32(.8)
-	weightInputBtoHiddenA := float32(.9)
-	weightInputBtoHiddenB := float32(.01)
-	weightHiddenAtoOutputA := float32(.02)
-	weightHiddenAtoOutputB := float32(.03)
-	weightHiddenBtoOutputA := float32(.04)
-	weightHiddenBtoOutputB := float32(.05)
+	weightInputAtoHiddenA := float64(.7)
+	weightInputAtoHiddenB := float64(.8)
+	weightInputBtoHiddenA := float64(.9)
+	weightInputBtoHiddenB := float64(.01)
+	weightHiddenAtoOutputA := float64(.02)
+	weightHiddenAtoOutputB := float64(.03)
+	weightHiddenBtoOutputA := float64(.04)
+	weightHiddenBtoOutputB := float64(.05)
 
 	{
 		// connect network
 		inputNeuronA.Output = []*Edge{
 			{
-				Weight: &Weight{Value: float32(weightInputAtoHiddenA)},
+				Weight: &Weight{Value: float64(weightInputAtoHiddenA)},
 				Neuron: &hiddenNeuronA,
 			},
 			{
-				Weight: &Weight{Value: float32(weightInputAtoHiddenB)},
+				Weight: &Weight{Value: float64(weightInputAtoHiddenB)},
 				Neuron: &hiddenNeuronB,
 			},
 		}
 		inputNeuronB.Output = []*Edge{
 			{
-				Weight: &Weight{Value: float32(weightInputBtoHiddenA)},
+				Weight: &Weight{Value: float64(weightInputBtoHiddenA)},
 				Neuron: &hiddenNeuronA,
 			},
 			{
-				Weight: &Weight{Value: float32(weightInputBtoHiddenB)},
+				Weight: &Weight{Value: float64(weightInputBtoHiddenB)},
 				Neuron: &hiddenNeuronB,
 			},
 		}
 		hiddenNeuronA.Output = []*Edge{
 			{
-				Weight: &Weight{Value: float32(weightHiddenAtoOutputA)},
+				Weight: &Weight{Value: float64(weightHiddenAtoOutputA)},
 				Neuron: &outputNeuronA,
 			},
 			{
-				Weight: &Weight{Value: float32(weightHiddenAtoOutputB)},
+				Weight: &Weight{Value: float64(weightHiddenAtoOutputB)},
 				Neuron: &outputNeuronB,
 			},
 		}
 		hiddenNeuronB.Output = []*Edge{
 			{
-				Weight: &Weight{Value: float32(weightHiddenBtoOutputA)},
+				Weight: &Weight{Value: float64(weightHiddenBtoOutputA)},
 				Neuron: &outputNeuronA,
 			},
 			{
-				Weight: &Weight{Value: float32(weightHiddenBtoOutputB)},
+				Weight: &Weight{Value: float64(weightHiddenBtoOutputB)},
 				Neuron: &outputNeuronB,
 			},
 		}
@@ -191,16 +191,16 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 	expectedHiddenActivationA := common.ReLU((weightInputAtoHiddenA * inputActivationA) + (weightInputBtoHiddenA * inputActivationB) + hiddenBiasA)
 	expectedHiddenActivationB := common.ReLU((weightInputBtoHiddenB * inputActivationB) + (weightInputAtoHiddenB * inputActivationA) + hiddenBiasB)
 
-	logits := []float32{
+	logits := []float64{
 		(expectedHiddenActivationA * weightHiddenAtoOutputA) + (expectedHiddenActivationB * weightHiddenBtoOutputA) + outputBiasA,
 		(expectedHiddenActivationA * weightHiddenAtoOutputB) + (expectedHiddenActivationB * weightHiddenBtoOutputB) + outputBiasB,
 	}
 
-	expectedActivations := map[*Neuron]float32{
+	expectedActivations := map[*Neuron]float64{
 		&inputNeuronA:  inputActivationA,
 		&inputNeuronB:  inputActivationB,
-		&outputNeuronA: common.SoftMax(logits[0], logits),
-		&outputNeuronB: common.SoftMax(logits[1], logits),
+		&outputNeuronA: common.SoftMax(logits)[0],
+		&outputNeuronB: common.SoftMax(logits)[1],
 	}
 
 	ann := &ANN{
@@ -256,7 +256,7 @@ func TestInputEncoding(t *testing.T) {
 
 	ann.InputEncoding(img)
 
-	expectedActivations := map[*Neuron]float32{
+	expectedActivations := map[*Neuron]float64{
 		neuronA: 0,
 		neuronB: 1,
 		neuronC: 1,

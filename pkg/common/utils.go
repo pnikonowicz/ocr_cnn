@@ -20,26 +20,37 @@ func PrintAndTerminate(message string) {
 	os.Exit(1)
 }
 
-func RandomUniformDistrbutionFunc(min, max float32) func() float32 {
-	return func() float32 {
-		return min + (max-min)*rand.Float32()
+func RandomUniformDistrbutionFunc(min, max float64) func() float64 {
+	return func() float64 {
+		return min + (max-min)*rand.Float64()
 	}
 }
 
-func ReLU(x float32) float32 {
-	return float32(math.Max(float64(x), float64(0)))
+func ReLU(x float64) float64 {
+	return math.Max(float64(x), float64(0))
 }
 
-func SoftMax(inputScoreLogit float32, logits []float32) float32 {
+func SoftMax(logits []float64) []float64 { // uses stable implementation
+	maxLogit := logits[0]
+	for _, v := range logits {
+		maxLogit = max(maxLogit, v)
+	}
+
+	result := make([]float64, len(logits))
 	exponentiation := float64(0)
+	for i, logit := range logits {
+		result[i] = math.Exp(logit - maxLogit)
+		exp := result[i]
 
-	for _, logit := range logits {
-		exponentiation += math.Exp(float64(logit))
+		exponentiation += exp
 	}
 
-	normalization := math.Exp(float64(inputScoreLogit)) / exponentiation
+	for i := range(len(logits)) {
+		inputScoreLogit := result[i]
+		result[i] = inputScoreLogit / exponentiation
+	}
 
-	return float32(normalization)
+	return result
 }
 
 func GetImage(number string, idx int) image.Image {
