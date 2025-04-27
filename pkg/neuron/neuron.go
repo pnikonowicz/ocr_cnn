@@ -29,7 +29,7 @@ type ANN struct {
 	OutputLayer []*Neuron
 }
 
-func CreateANN(randomFunc func() float64, inputLayerSize, numberOfHiddenLayers int) ANN {
+func CreateANN(randomFunc func(int) float64, inputLayerSize, numberOfHiddenLayers int) ANN {
 	layerSizes := []int{}
 	{ // plot the size of each layer
 		layerSizes = append(layerSizes, inputLayerSize)
@@ -56,7 +56,7 @@ func CreateANN(randomFunc func() float64, inputLayerSize, numberOfHiddenLayers i
 
 		for _, lastNeuron := range lastLayer { // connect the graph bipartite
 			for _, currentNeuron := range currentLayer {
-				weight := Weight{Value: randomFunc()}
+				weight := Weight{Value: randomFunc(len(lastLayer))}
 				lastNeuron.Output = append(lastNeuron.Output, &Edge{
 					Neuron: currentNeuron,
 					Weight: &weight,

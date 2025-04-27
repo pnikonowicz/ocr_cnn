@@ -20,13 +20,13 @@ func PrintAndTerminate(message string) {
 	os.Exit(1)
 }
 
-func RandomUniformDistrbutionFunc(min, max float64) func() float64 {
-	return func() float64 {
+func RandomUniformDistrbutionFunc(min, max float64) func(int) float64 {
+	return func(_ int) float64 {
 		return min + (max-min)*rand.Float64()
 	}
 }
 
-func NormalHe() func(int) float64 {
+func NormalDistributionHe() func(int) float64 {
 	return func(n int) float64 {
 		if n <= 0 {
 			PrintAndTerminate(fmt.Sprintf("invalid n vaue for NormalHe: %d", n))

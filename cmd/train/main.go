@@ -37,7 +37,7 @@ func main() {
 	layerSize := resolutionX * resolutionY
 	const numberOfHiddenLayers = 2
 
-	ann := neuron.CreateANN(common.RandomUniformDistrbutionFunc(-1, 1), layerSize, numberOfHiddenLayers)
+	ann := neuron.CreateANN(common.NormalDistributionHe(), layerSize, numberOfHiddenLayers)
 
 	fmt.Printf("created %d input layer neurons\n", len(ann.InputLayer))
 	firstHiddenLayer := map[*neuron.Neuron]bool{}

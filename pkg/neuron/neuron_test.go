@@ -10,7 +10,7 @@ import (
 
 func TestGraphIsConnectedWithRandomWeightsAndBias(t *testing.T) {
 	const randomNumber = 1.2
-	randomFunc := func() float64 {
+	randomFunc := func(fanInSize int) float64 {
 		return randomNumber
 	}
 	ann := CreateANN(randomFunc, 2, 1)

@@ -1,9 +1,5 @@
 # TODO
 
-## forward propagation bug
-
-1. replace RandomUniformDistrbutionFunc with NormalHe function
-
 ## back propagation
 
 ### loss function
