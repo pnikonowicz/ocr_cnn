@@ -2,8 +2,7 @@
 
 ## forward propagation bug
 
-1. it appears as if we are overflowing on forward propagation
-2. output layer probabilities should sum to 100% but do not
+1. use Kaiming Initialization for weight initialization to improve training time 
 
 ## back propagation
 
