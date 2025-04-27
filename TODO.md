@@ -2,7 +2,7 @@
 
 ## forward propagation bug
 
-1. use Kaiming Initialization for weight initialization to improve training time 
+1. replace RandomUniformDistrbutionFunc with NormalHe function
 
 ## back propagation
 

@@ -26,6 +26,16 @@ func RandomUniformDistrbutionFunc(min, max float64) func() float64 {
 	}
 }
 
+func NormalHe() func(int) float64 {
+	return func(n int) float64 {
+		if n <= 0 {
+			PrintAndTerminate(fmt.Sprintf("invalid n vaue for NormalHe: %d", n))
+		}
+		stdDev := math.Sqrt(2.0 / float64(n))
+		return stdDev * rand.NormFloat64()
+	}
+}
+
 func ReLU(x float64) float64 {
 	return math.Max(float64(x), float64(0))
 }
