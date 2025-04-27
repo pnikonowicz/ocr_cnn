@@ -16,3 +16,11 @@ Image Binarization: Takes the dataset and converts to only be black and white.
 
 Asserts that the images are formatted properly.
 All images must have the same resolution and only contain 2 colors.
+
+## Development
+
+run all tests with:
+
+```bash
+go test ./...
+```
