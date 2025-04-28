@@ -39,12 +39,7 @@ func main() {
 
 	ann := neuron.CreateANN(common.NormalDistributionHe(), layerSize, numberOfHiddenLayers)
 
-	fmt.Printf("created %d input layer neurons\n", len(ann.InputLayer))
-	firstHiddenLayer := map[*neuron.Neuron]bool{}
-	for _, edge := range ann.InputLayer[0].Output {
-		firstHiddenLayer[edge.Neuron] = true
-	}
-
+	common.Log(fmt.Sprintf("created %d input layer neurons", len(ann.InputLayer)))
 	common.Log(fmt.Sprintf("created %d first hidden layer neurons", len(ann.InputLayer[0].Output)))
 	common.Log(fmt.Sprintf("created %d second hidden layer neurons", len(ann.OutputLayer[0].Input)))
 	common.Log(fmt.Sprintf("created %d output layer neurons", len(ann.OutputLayer)))
