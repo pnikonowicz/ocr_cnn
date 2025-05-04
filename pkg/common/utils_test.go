@@ -15,7 +15,7 @@ func TestSoftMax(t *testing.T) {
 
 	// should add up to near 1
 	sum := float64(0)
-	for _, v := range(actual) {
+	for _, v := range actual {
 		sum += v
 	}
 
