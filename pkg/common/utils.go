@@ -40,6 +40,22 @@ func ReLU(x float64) float64 {
 	return math.Max(float64(x), float64(0))
 }
 
+func CrossEntropyLoss(trueProababilities []float64, predictedProbabilities []float64) float64 {
+	sum := float64(0)
+
+	for i := range len(predictedProbabilities) {
+		predictedProbability := predictedProbabilities[i]
+		trueProabability := trueProababilities[i]
+
+		log := math.Log(predictedProbability)
+		loss := log * trueProabability
+
+		sum += loss
+	}
+
+	return -sum
+}
+
 func SoftMax(logits []float64) []float64 { // uses stable implementation
 	maxLogit := logits[0]
 	for _, v := range logits {

@@ -23,3 +23,15 @@ func TestSoftMax(t *testing.T) {
 		t.Errorf("expected sum to equal 1 but was: %f", sum)
 	}
 }
+
+func TestCrossEntropyLoss(t *testing.T) {
+	trueProability := []float64{0, 1, 0}
+	predictedProbility := []float64{0.1, 0.8, 0.1}
+	expectedLoss := -math.Log(0.8)
+
+	actualLoss := CrossEntropyLoss(trueProability, predictedProbility)
+
+	if actualLoss != expectedLoss {
+		t.Errorf("expected loss to be %f but was: %f", expectedLoss, actualLoss)
+	}
+}
