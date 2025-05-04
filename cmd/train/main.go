@@ -44,8 +44,10 @@ func main() {
 	common.Log(fmt.Sprintf("created %d second hidden layer neurons", len(ann.OutputLayer[0].Input)))
 	common.Log(fmt.Sprintf("created %d output layer neurons", len(ann.OutputLayer)))
 
-	common.Log("loading an image")
-	img := common.GetImage("0", 0)
+	imageNumber := "0"
+
+	common.Log(fmt.Sprintf("loading image %s", imageNumber))
+	img := common.GetImage(imageNumber, 0)
 
 	common.Log("encode image")
 	ann.InputEncoding(img)
@@ -61,5 +63,19 @@ func main() {
 	}
 	common.Log(fmt.Sprintf("sum: %f", sum))
 
+	trueProbabilities := []float64{1, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	loss := common.CrossEntropyLoss(trueProbabilities, outputToVector(ann.OutputLayer))
+	common.Log(fmt.Sprintf("loss for image %s: %f", imageNumber, loss))
+
 	common.Log("done")
+}
+
+func outputToVector(neuron []*neuron.Neuron) []float64 {
+	vector := make([]float64, len(neuron))
+
+	for i := range len(neuron) {
+		vector[i] = neuron[i].Activation
+	}
+
+	return vector
 }
