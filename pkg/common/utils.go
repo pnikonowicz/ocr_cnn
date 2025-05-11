@@ -44,7 +44,7 @@ func ReLU(x float64) float64 {
 	return math.Max(float64(x), float64(0))
 }
 
-func CrossEntropyLoss(trueProababilities [10]float64, predictedProbabilities []float64) float64 {
+func CrossEntropyLoss(trueProababilities []float64, predictedProbabilities []float64) float64 {
 	sum := float64(0)
 
 	for i := range len(predictedProbabilities) {
