@@ -15,6 +15,10 @@ func Log(message string) {
 	fmt.Println(message)
 }
 
+func Debug(message string) {
+	Log(message)
+}
+
 func PrintAndTerminate(message string) {
 	Log(message)
 	os.Exit(1)
