@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"image"
 	"image/png"
 	"ocr_cnn/pkg/common"
 	"ocr_cnn/pkg/neuron"
@@ -44,11 +45,19 @@ func main() {
 	common.Log(fmt.Sprintf("created %d second hidden layer neurons", len(ann.OutputLayer[0].Input)))
 	common.Log(fmt.Sprintf("created %d output layer neurons", len(ann.OutputLayer)))
 
-	imageNumber := "0"
+	loss := float64(0)
+	for i := 0; i <= 9; i++ {
 		common.Debug(fmt.Sprintf("loading image %d", i))
+		img := common.GetImage(fmt.Sprintf("%d", i), 0)
+		loss += singlePassWithImage(&ann, img, i)
+	}
+	mean := loss / 10
 
-	img := common.GetImage(imageNumber, 0)
+	common.Log(fmt.Sprintf("mean: %f", mean))
+	common.Log("done")
+}
 
+func singlePassWithImage(ann *neuron.ANN, img image.Image, imageType int) float64 {
 	common.Debug("encode image")
 	ann.InputEncoding(img)
 
@@ -63,11 +72,13 @@ func main() {
 	}
 	common.Debug(fmt.Sprintf("sum: %f", sum))
 
-	trueProbabilities := []float64{1, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-	loss := common.CrossEntropyLoss(trueProbabilities, outputToVector(ann.OutputLayer))
+	var expectedOneHotEncoding [10]float64 // 10 possible images
+	expectedOneHotEncoding[imageType] = 1  // expected image cooresponds to index
 
-	common.Log("done")
+	loss := common.CrossEntropyLoss(expectedOneHotEncoding, outputToVector(ann.OutputLayer))
 	common.Debug(fmt.Sprintf("loss for image %d: %f", imageType, loss))
+
+	return loss
 }
 
 func outputToVector(neuron []*neuron.Neuron) []float64 {
