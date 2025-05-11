@@ -2,13 +2,7 @@
 
 ## back propagation
 
-### loss function
-
-* use categorical cross-entropy on the output layer
-
-### loss function mean
-
-* apply the loss function for X amount of test runs and find the mean value
+* use logits, softmax to update weights and biases
 
 ### update weights
 
