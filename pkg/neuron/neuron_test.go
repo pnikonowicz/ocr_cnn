@@ -199,8 +199,8 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 	expectedActivations := map[*Neuron]float64{
 		&inputNeuronA:  inputActivationA,
 		&inputNeuronB:  inputActivationB,
-		&outputNeuronA: common.SoftMax(logits)[0],
-		&outputNeuronB: common.SoftMax(logits)[1],
+		&outputNeuronA: logits[0],
+		&outputNeuronB: logits[1],
 	}
 
 	ann := &ANN{
