@@ -134,6 +134,25 @@ func (ann *ANN) ForwardPropagation() []float64 {
 	return logits
 }
 
+func (ann *ANN) BackwardPropagation(expectedOneHotEncoding []float64) {
+	softmaxVector := outputToVector(ann.OutputLayer)
+
+	// find gradients via chain rule
+	common.CrossEntropyPartialDerivative(softmaxVector, expectedOneHotEncoding)
+	// Softmax partial derivitive
+	// RELU gradiant for every hidden layer
+}
+
+func outputToVector(neuron []*Neuron) []float64 {
+	vector := make([]float64, len(neuron))
+
+	for i := range len(neuron) {
+		vector[i] = neuron[i].Activation
+	}
+
+	return vector
+}
+
 func colorsEqual(c1, c2 color.Color) bool {
 	r1, g1, b1, a1 := c1.RGBA()
 	r2, g2, b2, a2 := c2.RGBA()

@@ -82,6 +82,34 @@ func SoftMax(logits []float64) []float64 { // uses stable implementation
 	return result
 }
 
+func SoftmaxPartialDerivitive(softmaxOutput []float64) [][]float64 {
+	n := len(softmaxOutput)
+	jacobian := make([][]float64, n)
+	for i := range jacobian {
+		jacobian[i] = make([]float64, n)
+		for j := range jacobian[i] {
+			if i == j {
+				jacobian[i][j] = softmaxOutput[i] * (1 - softmaxOutput[i])
+			} else {
+				jacobian[i][j] = -softmaxOutput[i] * softmaxOutput[j]
+			}
+		}
+	}
+	return jacobian
+}
+
+func CrossEntropyPartialDerivative(softmaxOutput, target []float64) []float64 {
+	grad := make([]float64, len(target))
+	for i := range target {
+		if softmaxOutput[i] == 0 {
+			grad[i] = 0 // prevent divide by 0
+		} else {
+			grad[i] = -target[i] / (softmaxOutput[i] + 1e-15) // avoid taking log of zero
+		}
+	}
+	return grad
+}
+
 func GetImage(number string, idx int) image.Image {
 	wd, _ := os.Getwd()
 	dataset_dir := path.Join(wd, "translated_dataset")
