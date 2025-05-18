@@ -81,7 +81,7 @@ func CreateANN(randomFunc func(int) float64, inputLayerSize, numberOfHiddenLayer
 	return ann
 }
 
-func (ann *ANN) ForwardPropagation() {
+func (ann *ANN) ForwardPropagation() []float64 {
 	calculateHiddenLayerActivations := func(inputLayer []*Neuron) {
 		currentLayer := inputLayer
 
@@ -105,34 +105,33 @@ func (ann *ANN) ForwardPropagation() {
 		}
 	}
 
-	calculateOutputLayerActivations := func(outputLayer []*Neuron) {
-		for _, neuron := range outputLayer {
+	calculateOutputLayerActivations := func(outputLayer []*Neuron) []float64 {
+		logits := make([]float64, len(outputLayer))
+
+		for i, neuron := range outputLayer {
 			logit := float64(0)
 			for _, inputNeuron := range neuron.Input {
 				activation := inputNeuron.Neuron.Activation
 				weight := inputNeuron.Weight.Value
 
-				logit += float64((activation * weight))
-
+				logit += float64(activation * weight)
 			}
-			bias := neuron.Bias
 
-			neuron.Activation = logit + float64(bias)
+			bias := neuron.Bias
+			logits[i] = logit + float64(bias)
 		}
+
+		for i, value := range common.SoftMax(logits) {
+			outputLayer[i].Activation = value
+		}
+
+		return logits
 	}
 
 	calculateHiddenLayerActivations(ann.InputLayer)
-	calculateOutputLayerActivations(ann.OutputLayer)
-}
+	logits := calculateOutputLayerActivations(ann.OutputLayer)
 
-func SoftMaxVector(layerVector []*Neuron) []float64 {
-	logits := make([]float64, len(layerVector))
-	for i, neuron := range layerVector {
-		logits[i] = neuron.Activation
-	}
-
-	softmaxVector := common.SoftMax(logits)
-	return softmaxVector
+	return logits
 }
 
 func colorsEqual(c1, c2 color.Color) bool {

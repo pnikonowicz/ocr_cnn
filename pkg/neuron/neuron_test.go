@@ -199,8 +199,8 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 	expectedActivations := map[*Neuron]float64{
 		&inputNeuronA:  inputActivationA,
 		&inputNeuronB:  inputActivationB,
-		&outputNeuronA: logits[0],
-		&outputNeuronB: logits[1],
+		&outputNeuronA: common.SoftMax(logits)[0],
+		&outputNeuronB: common.SoftMax(logits)[1],
 	}
 
 	ann := &ANN{
@@ -212,7 +212,14 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 		},
 	}
 
-	ann.ForwardPropagation()
+	actualLogits := ann.ForwardPropagation()
+
+	for i, actualLogit := range actualLogits {
+		expectedLogit := logits[i]
+		if expectedLogit != actualLogit {
+			t.Fatalf("expected logit %f at %d does not match actual logit %f at %d", expectedLogit, i, actualLogit, i)
+		}
+	}
 
 	for i, outputNode := range ann.OutputLayer {
 		expectedActivation := expectedActivations[outputNode]

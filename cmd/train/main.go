@@ -69,16 +69,15 @@ func singlePassWithImage(ann *neuron.ANN, img image.Image, imageType int) float6
 	expectedOneHotEncoding := make([]float64, 10) // 10 possible images
 	expectedOneHotEncoding[imageType] = 1         // onehot encoding value maps to imageType
 
-	softmaxVector := neuron.SoftMaxVector(ann.OutputLayer)
-
 	sum := float64(0)
-	for i, scalar := range softmaxVector {
+	for i, node := range ann.OutputLayer {
+		scalar := node.Activation
 		sum += scalar
 		common.Debug(fmt.Sprintf("   %d: %f", i, scalar))
 	}
 	common.Debug(fmt.Sprintf("sum: %f", sum))
 
-	loss := common.CrossEntropyLoss(expectedOneHotEncoding, softmaxVector)
+	loss := common.CrossEntropyLoss(expectedOneHotEncoding, outputToVector(ann.OutputLayer))
 	common.Debug(fmt.Sprintf("loss for image %d: %f", imageType, loss))
 
 	return loss
