@@ -75,7 +75,7 @@ func singlePassWithImage(ann *neuron.ANN, img image.Image, imageType int) float6
 		sum += scalar
 		common.Debug(fmt.Sprintf("   %d: %f", i, scalar))
 	}
-	common.Debug(fmt.Sprintf("sum: %f", sum))
+	common.Debug(fmt.Sprintf("sum (should equal 100): %f", sum))
 
 	loss := common.CrossEntropyLoss(expectedOneHotEncoding, outputToVector(ann.OutputLayer))
 	common.Debug(fmt.Sprintf("loss for image %d: %f", imageType, loss))
