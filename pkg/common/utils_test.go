@@ -2,6 +2,7 @@ package common
 
 import (
 	"math"
+	"slices"
 	"testing"
 )
 
@@ -33,5 +34,22 @@ func TestCrossEntropyLoss(t *testing.T) {
 
 	if actualLoss != expectedLoss {
 		t.Errorf("expected loss to be %f but was: %f", expectedLoss, actualLoss)
+	}
+}
+
+func TestSoftmaxCrossEntroypGradient(t *testing.T) {
+	outputVector := []float64{1, 2, 3}
+	expectedVector := []float64{0, 1, 0}
+
+	actualGradientVector := SoftmaxCrossEntroypGradient(outputVector, expectedVector)
+
+	expectedGradientVector := []float64{
+		outputVector[0] - expectedVector[0],
+		outputVector[1] - expectedVector[1],
+		outputVector[2] - expectedVector[2],
+	}
+
+	if !slices.Equal(expectedGradientVector, actualGradientVector) {
+		t.Errorf("expected gradient vector to be %v but was %v", expectedGradientVector, actualGradientVector)
 	}
 }
