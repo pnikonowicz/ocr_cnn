@@ -139,11 +139,18 @@ func (ann *ANN) BackwardPropagation(expectedOneHotEncoding []float64, learningRa
 
 	// find softmax cross entropy gradient of loss w.r.t softmax
 	gradientVector := common.SoftmaxCrossEntropyGradient(softmaxVector, expectedOneHotEncoding)
-	fmt.Printf("gradient vector: %v\n", gradientVector)
 
-	// find gradients via chain rule
-	common.CrossEntropyPartialDerivative(softmaxVector, expectedOneHotEncoding)
-	// Softmax partial derivitive
+	// update output layer weights
+	for j, outputNode := range ann.OutputLayer {
+		for _, inputEdge := range outputNode.Input {
+			crossEntroypLossGradient := gradientVector[j]
+			gradientOfLossWithRespectToWeight := crossEntroypLossGradient * inputEdge.Neuron.Activation
+			delta := learningRate * gradientOfLossWithRespectToWeight
+
+			inputEdge.Weight.Value -= delta
+		}
+	}
+
 	// RELU gradiant for every hidden layer
 }
 

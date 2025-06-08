@@ -236,6 +236,130 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 	}
 }
 
+func TestBackwardPropagationPerformsCorrectCalculations(t *testing.T) {
+	outputBiasA := float64(.1)
+	outputBiasB := float64(.2)
+	hiddenBiasA := float64(.3)
+	hiddenBiasB := float64(.4)
+
+	inputActivationA := float64(.5)
+	inputActivationB := float64(.6)
+
+	inputNeuronA := Neuron{
+		Activation: inputActivationA,
+	}
+	inputNeuronB := Neuron{
+		Activation: inputActivationB,
+	}
+	hiddenNeuronA := Neuron{
+		Bias: hiddenBiasA,
+	}
+	hiddenNeuronB := Neuron{
+		Bias: hiddenBiasB,
+	}
+	outputNeuronA := Neuron{
+		Bias: outputBiasA,
+	}
+	outputNeuronB := Neuron{
+		Bias: outputBiasB,
+	}
+
+	weightInputAtoHiddenA := float64(.7)
+	weightInputAtoHiddenB := float64(.8)
+	weightInputBtoHiddenA := float64(.9)
+	weightInputBtoHiddenB := float64(.01)
+	weightHiddenAtoOutputA := float64(.02)
+	weightHiddenAtoOutputB := float64(.03)
+	weightHiddenBtoOutputA := float64(.04)
+	weightHiddenBtoOutputB := float64(.05)
+
+	{
+		// connect network
+		inputNeuronA.Output = []*Edge{
+			{
+				Weight: &Weight{Value: float64(weightInputAtoHiddenA)},
+				Neuron: &hiddenNeuronA,
+			},
+			{
+				Weight: &Weight{Value: float64(weightInputAtoHiddenB)},
+				Neuron: &hiddenNeuronB,
+			},
+		}
+		inputNeuronB.Output = []*Edge{
+			{
+				Weight: &Weight{Value: float64(weightInputBtoHiddenA)},
+				Neuron: &hiddenNeuronA,
+			},
+			{
+				Weight: &Weight{Value: float64(weightInputBtoHiddenB)},
+				Neuron: &hiddenNeuronB,
+			},
+		}
+		hiddenNeuronA.Output = []*Edge{
+			{
+				Weight: &Weight{Value: float64(weightHiddenAtoOutputA)},
+				Neuron: &outputNeuronA,
+			},
+			{
+				Weight: &Weight{Value: float64(weightHiddenAtoOutputB)},
+				Neuron: &outputNeuronB,
+			},
+		}
+		hiddenNeuronB.Output = []*Edge{
+			{
+				Weight: &Weight{Value: float64(weightHiddenBtoOutputA)},
+				Neuron: &outputNeuronA,
+			},
+			{
+				Weight: &Weight{Value: float64(weightHiddenBtoOutputB)},
+				Neuron: &outputNeuronB,
+			},
+		}
+		hiddenNeuronA.Input = []*Edge{
+			{
+				Weight: inputNeuronA.Output[0].Weight,
+				Neuron: &inputNeuronA,
+			},
+			{
+				Weight: inputNeuronB.Output[0].Weight,
+				Neuron: &inputNeuronB,
+			},
+		}
+		hiddenNeuronB.Input = []*Edge{
+			{
+				Weight: inputNeuronA.Output[1].Weight,
+				Neuron: &inputNeuronA,
+			},
+			{
+				Weight: inputNeuronB.Output[1].Weight,
+				Neuron: &inputNeuronB,
+			},
+		}
+		outputNeuronA.Input = []*Edge{
+			{
+				Weight: hiddenNeuronA.Output[0].Weight,
+				Neuron: &hiddenNeuronA,
+			},
+			{
+				Weight: hiddenNeuronB.Output[0].Weight,
+				Neuron: &hiddenNeuronB,
+			},
+		}
+		outputNeuronB.Input = []*Edge{
+			{
+				Weight: hiddenNeuronA.Output[1].Weight,
+				Neuron: &hiddenNeuronA,
+			},
+			{
+				Weight: hiddenNeuronB.Output[1].Weight,
+				Neuron: &hiddenNeuronB,
+			},
+		}
+	}
+
+	// TODO: assertions
+}
+
 func TestInputEncoding(t *testing.T) {
 	expectedColorBlack := color.RGBA{0, 0, 0, 255}
 	expectedColorWhite := color.RGBA{255, 255, 255, 255}
