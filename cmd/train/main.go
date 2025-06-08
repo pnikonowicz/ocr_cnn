@@ -80,7 +80,8 @@ func singlePassWithImage(ann *neuron.ANN, img image.Image, imageType int) float6
 	loss := common.CrossEntropyLoss(expectedOneHotEncoding, outputToVector(ann.OutputLayer))
 	common.Debug(fmt.Sprintf("loss for image %d: %f", imageType, loss))
 
-	ann.BackwardPropagation(expectedOneHotEncoding)
+	learningRate := .01
+	ann.BackwardPropagation(expectedOneHotEncoding, learningRate)
 
 	return loss
 }

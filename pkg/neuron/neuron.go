@@ -134,7 +134,7 @@ func (ann *ANN) ForwardPropagation() []float64 {
 	return logits
 }
 
-func (ann *ANN) BackwardPropagation(expectedOneHotEncoding []float64) {
+func (ann *ANN) BackwardPropagation(expectedOneHotEncoding []float64, learningRate float64) {
 	softmaxVector := outputToVector(ann.OutputLayer)
 
 	// find softmax cross entropy gradient of loss w.r.t softmax
