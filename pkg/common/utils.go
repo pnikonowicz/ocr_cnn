@@ -98,7 +98,7 @@ func SoftmaxPartialDerivitive(softmaxOutput []float64) [][]float64 {
 	return jacobian
 }
 
-func SoftmaxCrossEntroypGradient(outputVector []float64, expectedVector []float64) []float64 {
+func SoftmaxCrossEntropyGradient(outputVector []float64, expectedVector []float64) []float64 {
 	gradientVector := make([]float64, len(outputVector))
 
 	for i := range outputVector {

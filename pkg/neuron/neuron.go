@@ -137,8 +137,8 @@ func (ann *ANN) ForwardPropagation() []float64 {
 func (ann *ANN) BackwardPropagation(expectedOneHotEncoding []float64) {
 	softmaxVector := outputToVector(ann.OutputLayer)
 
-	// find softmax cross entroyp gradient of loss w.r.t softmax
-	gradientVector := common.SoftmaxCrossEntroypGradient(softmaxVector, expectedOneHotEncoding)
+	// find softmax cross entropy gradient of loss w.r.t softmax
+	gradientVector := common.SoftmaxCrossEntropyGradient(softmaxVector, expectedOneHotEncoding)
 	fmt.Printf("gradient vector: %v\n", gradientVector)
 
 	// find gradients via chain rule

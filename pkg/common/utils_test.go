@@ -41,7 +41,7 @@ func TestSoftmaxCrossEntroypGradient(t *testing.T) {
 	outputVector := []float64{1, 2, 3}
 	expectedVector := []float64{0, 1, 0}
 
-	actualGradientVector := SoftmaxCrossEntroypGradient(outputVector, expectedVector)
+	actualGradientVector := SoftmaxCrossEntropyGradient(outputVector, expectedVector)
 
 	expectedGradientVector := []float64{
 		outputVector[0] - expectedVector[0],
