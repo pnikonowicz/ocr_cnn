@@ -236,11 +236,12 @@ func TestForwardPropagationPeformsCorrectCalculations(t *testing.T) {
 	}
 }
 
-func TestBackwardPropagationPerformsCorrectCalculations(t *testing.T) {
+func TestBackwardPropagationPerformsCorrectCalculationsOnOutputLayer(t *testing.T) {
 	outputBiasA := float64(.1)
 	outputBiasB := float64(.2)
-	hiddenBiasA := float64(.3)
-	hiddenBiasB := float64(.4)
+
+	outputActivationA := float64(.3)
+	outputActivationB := float64(.4)
 
 	inputActivationA := float64(.5)
 	inputActivationB := float64(.6)
@@ -251,71 +252,43 @@ func TestBackwardPropagationPerformsCorrectCalculations(t *testing.T) {
 	inputNeuronB := Neuron{
 		Activation: inputActivationB,
 	}
-	hiddenNeuronA := Neuron{
-		Bias: hiddenBiasA,
-	}
-	hiddenNeuronB := Neuron{
-		Bias: hiddenBiasB,
-	}
 	outputNeuronA := Neuron{
-		Bias: outputBiasA,
+		Bias:       outputBiasA,
+		Activation: outputActivationA,
 	}
 	outputNeuronB := Neuron{
-		Bias: outputBiasB,
+		Bias:       outputBiasB,
+		Activation: outputActivationB,
 	}
 
-	weightInputAtoHiddenA := float64(.7)
-	weightInputAtoHiddenB := float64(.8)
-	weightInputBtoHiddenA := float64(.9)
-	weightInputBtoHiddenB := float64(.01)
-	weightHiddenAtoOutputA := float64(.02)
-	weightHiddenAtoOutputB := float64(.03)
-	weightHiddenBtoOutputA := float64(.04)
-	weightHiddenBtoOutputB := float64(.05)
+	weightInputAtoOutputA := Weight{Value: float64(.7)}
+	weightInputAtoOutputB := Weight{Value: float64(.8)}
+	weightInputBtoOutputA := Weight{Value: float64(.9)}
+	weightInputBtoOutputB := Weight{Value: float64(.01)}
 
 	{
 		// connect network
 		inputNeuronA.Output = []*Edge{
 			{
-				Weight: &Weight{Value: float64(weightInputAtoHiddenA)},
-				Neuron: &hiddenNeuronA,
+				Weight: &weightInputAtoOutputA,
+				Neuron: &outputNeuronA,
 			},
 			{
-				Weight: &Weight{Value: float64(weightInputAtoHiddenB)},
-				Neuron: &hiddenNeuronB,
+				Weight: &weightInputAtoOutputB,
+				Neuron: &outputNeuronB,
 			},
 		}
 		inputNeuronB.Output = []*Edge{
 			{
-				Weight: &Weight{Value: float64(weightInputBtoHiddenA)},
-				Neuron: &hiddenNeuronA,
-			},
-			{
-				Weight: &Weight{Value: float64(weightInputBtoHiddenB)},
-				Neuron: &hiddenNeuronB,
-			},
-		}
-		hiddenNeuronA.Output = []*Edge{
-			{
-				Weight: &Weight{Value: float64(weightHiddenAtoOutputA)},
+				Weight: &weightInputBtoOutputA,
 				Neuron: &outputNeuronA,
 			},
 			{
-				Weight: &Weight{Value: float64(weightHiddenAtoOutputB)},
+				Weight: &weightInputBtoOutputB,
 				Neuron: &outputNeuronB,
 			},
 		}
-		hiddenNeuronB.Output = []*Edge{
-			{
-				Weight: &Weight{Value: float64(weightHiddenBtoOutputA)},
-				Neuron: &outputNeuronA,
-			},
-			{
-				Weight: &Weight{Value: float64(weightHiddenBtoOutputB)},
-				Neuron: &outputNeuronB,
-			},
-		}
-		hiddenNeuronA.Input = []*Edge{
+		outputNeuronA.Input = []*Edge{
 			{
 				Weight: inputNeuronA.Output[0].Weight,
 				Neuron: &inputNeuronA,
@@ -325,7 +298,7 @@ func TestBackwardPropagationPerformsCorrectCalculations(t *testing.T) {
 				Neuron: &inputNeuronB,
 			},
 		}
-		hiddenNeuronB.Input = []*Edge{
+		outputNeuronB.Input = []*Edge{
 			{
 				Weight: inputNeuronA.Output[1].Weight,
 				Neuron: &inputNeuronA,
@@ -335,29 +308,39 @@ func TestBackwardPropagationPerformsCorrectCalculations(t *testing.T) {
 				Neuron: &inputNeuronB,
 			},
 		}
-		outputNeuronA.Input = []*Edge{
-			{
-				Weight: hiddenNeuronA.Output[0].Weight,
-				Neuron: &hiddenNeuronA,
-			},
-			{
-				Weight: hiddenNeuronB.Output[0].Weight,
-				Neuron: &hiddenNeuronB,
-			},
-		}
-		outputNeuronB.Input = []*Edge{
-			{
-				Weight: hiddenNeuronA.Output[1].Weight,
-				Neuron: &hiddenNeuronA,
-			},
-			{
-				Weight: hiddenNeuronB.Output[1].Weight,
-				Neuron: &hiddenNeuronB,
-			},
-		}
 	}
 
-	// TODO: assertions
+	ann := &ANN{
+		InputLayer: []*Neuron{
+			&inputNeuronA, &inputNeuronB,
+		},
+		OutputLayer: []*Neuron{
+			&outputNeuronA, &outputNeuronB,
+		},
+	}
+
+	expectedOneHotEncodedOutput := []float64{1, 0}
+	learningRate := .1
+
+	expectedWeights := map[*Weight]float64{
+		&weightInputAtoOutputA: inputNeuronA.Output[0].Weight.Value - (learningRate * inputNeuronA.Activation * (outputNeuronA.Activation - expectedOneHotEncodedOutput[0])),
+		&weightInputAtoOutputB: inputNeuronA.Output[1].Weight.Value - (learningRate * inputNeuronA.Activation * (outputNeuronB.Activation - expectedOneHotEncodedOutput[1])),
+		&weightInputBtoOutputA: inputNeuronB.Output[0].Weight.Value - (learningRate * inputNeuronB.Activation * (outputNeuronA.Activation - expectedOneHotEncodedOutput[0])),
+		&weightInputBtoOutputB: inputNeuronB.Output[1].Weight.Value - (learningRate * inputNeuronB.Activation * (outputNeuronB.Activation - expectedOneHotEncodedOutput[1])),
+	}
+
+	ann.BackwardPropagation(expectedOneHotEncodedOutput, learningRate)
+
+	for i, outputNeuron := range ann.OutputLayer {
+		for j, inputNeuron := range outputNeuron.Input {
+			actualWeight := inputNeuron.Weight
+			expectedWeight := expectedWeights[actualWeight]
+
+			if actualWeight.Value != expectedWeight {
+				t.Fatalf("weight number (%d,%d): expected %f but got %f", i, j, expectedWeight, actualWeight.Value)
+			}
+		}
+	}
 }
 
 func TestInputEncoding(t *testing.T) {
